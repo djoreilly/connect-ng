@@ -41,10 +41,6 @@ Requires:       ca-certificates-mozilla
 %endif
 Requires:       coreutils
 # ExclusiveArch from this package
-%ifarch %ix86 ia64 x86_64 %arm aarch64
-Requires:       dmidecode
-%endif
-# ExclusiveArch from this package
 %ifarch s390x
 Requires:       s390-tools
 %endif

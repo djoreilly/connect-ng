@@ -10,11 +10,6 @@ import (
 	"strings"
 )
 
-var (
-	cloudEx = `Version: .*(amazon)|Manufacturer: (Amazon)|Manufacturer: (Google)|Manufacturer: (Microsoft) Corporation`
-	cloudRe = regexp.MustCompile(cloudEx)
-)
-
 const (
 	archX86  = "x86_64"
 	archARM  = "aarch64"
@@ -134,20 +129,26 @@ func lscpu2map(b []byte) map[string]string {
 }
 
 func cloudProvider() string {
-	output, err := execute([]string{"dmidecode", "-t", "system"}, nil)
+	version, err := os.ReadFile("/sys/devices/virtual/dmi/id/product_version")
 	if err != nil {
 		return ""
 	}
-	return findCloudProvider(output)
-}
+	if bytes.Contains(version, []byte("amazon")) {
+		return "amazon"
+	}
 
-// findCloudProvider returns the cloud provider from "dmidecode -t system" output
-func findCloudProvider(b []byte) string {
-	match := cloudRe.FindSubmatch(b)
-	for i, m := range match {
-		if i != 0 && len(m) > 0 {
-			return string(m)
-		}
+	vendor, err := os.ReadFile("/sys/devices/virtual/dmi/id/sys_vendor")
+	if err != nil {
+		return ""
+	}
+	if bytes.Contains(vendor, []byte("Amazon")) {
+		return "Amazon"
+	}
+	if bytes.Contains(vendor, []byte("Microsoft")) {
+		return "Microsoft"
+	}
+	if bytes.Contains(vendor, []byte("Google")) {
+		return "Google"
 	}
 	return ""
 }
@@ -172,15 +173,12 @@ func uuid() (string, error) {
 		}
 		return string(content), nil
 	}
-	output, err := execute([]string{"dmidecode", "-s", "system-uuid"}, nil)
+
+	content, err := os.ReadFile("/sys/devices/virtual/dmi/id/product_uuid")
 	if err != nil {
 		return "", err
 	}
-	out := string(output)
-	if strings.Contains(out, "Not Settable") || strings.Contains(out, "Not Present") {
-		return "", nil
-	}
-	return out, nil
+	return string(content), nil
 }
 
 // uuidS390 returns the system uuid on S390 or "" if it cannot be found

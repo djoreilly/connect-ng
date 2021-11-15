@@ -26,6 +26,7 @@
   This is a bug and it's already fixed in the Go version.
 - With --debug the Go version sends all debug output to stderr. The Ruby
   version sends http debug to stderr, and other debug to stdout.
+- Info from /sys/devices/virtual/dmi/id is used instead of dmidecode.
 - In zypper-migration plugin, `--download <mode>` flag doesn't validate `<mode>`.
 - Additional `--debug` flag was added to zypper-migration plugin to enable
   `SUSEConnect` debug info.

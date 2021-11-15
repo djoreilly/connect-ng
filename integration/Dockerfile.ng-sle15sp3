@@ -15,7 +15,7 @@ RUN zypper ar http://download.suse.de/ibs/SUSE/Products/SLE-Module-Basesystem/15
     zypper ar https://download.opensuse.org/repositories/openSUSE:/Tools/SLE_15_SP3/ opensuse-tools &&\
     zypper --non-interactive --gpg-auto-import-keys ref opensuse-tools &&\
     zypper --non-interactive up &&\
-    zypper --non-interactive install git-core ruby-devel make gcc gcc-c++ build wget dmidecode \
+    zypper --non-interactive install git-core ruby-devel make gcc gcc-c++ build wget \
       vim osc hwinfo libx86emu3 zypper-migration-plugin sudo awk curl \
       obs-service-tar_scm obs-service-recompress obs-service-extract_file obs-service-set_version obs-service-format_spec_file
 
