@@ -4,8 +4,19 @@ import (
 	"encoding/json"
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 )
+
+type intOrString int
+
+func (i *intOrString) UnmarshalJSON(data []byte) error {
+	s := strings.Trim(string(data), "\"")
+	if v, err := strconv.Atoi(s); err == nil {
+		*i = intOrString(v)
+	}
+	return nil
+}
 
 // Product represents an installed product or product information from API
 type Product struct {
@@ -26,15 +37,15 @@ type Product struct {
 	Extensions []Product `json:"extensions,omitempty"`
 
 	// these are used by YaST
-	ID           int    `json:"id"`
-	Description  string `xml:"description" json:"description,omitempty"`
-	EULAURL      string `json:"eula_url,omitempty"`
-	FormerName   string `json:"former_identifier,omitempty"`
-	ProductType  string `json:"product_type,omitempty"`
-	ShortName    string `json:"shortname,omitempty"`
-	LongName     string `json:"name,omitempty"`
-	ReleaseStage string `json:"release_stage,omitempty"`
-	Repositories []Repo `json:"repositories,omitempty"`
+	ID           intOrString `json:"id"`
+	Description  string      `xml:"description" json:"description,omitempty"`
+	EULAURL      string      `json:"eula_url,omitempty"`
+	FormerName   string      `json:"former_identifier,omitempty"`
+	ProductType  string      `json:"product_type,omitempty"`
+	ShortName    string      `json:"shortname,omitempty"`
+	LongName     string      `json:"name,omitempty"`
+	ReleaseStage string      `json:"release_stage,omitempty"`
+	Repositories []Repo      `json:"repositories,omitempty"`
 }
 
 // UnmarshalJSON custom unmarshaller for Product.

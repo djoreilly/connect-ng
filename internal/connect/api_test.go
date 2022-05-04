@@ -1,6 +1,8 @@
 package connect
 
 import (
+	"bytes"
+	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -265,5 +267,36 @@ func TestProductMigrations(t *testing.T) {
 	}
 	if len(migrations) != 2 {
 		t.Fatalf("len(migrations) == %d, expected 2", len(migrations))
+	}
+}
+
+func TestProductMigrationsSMT(t *testing.T) {
+	createTestCredentials("", "", t)
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write(readTestFile("migrations-smt.json", t))
+	}))
+	defer ts.Close()
+	CFG.BaseURL = ts.URL
+
+	migrations, err := productMigrations(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(migrations) != 1 {
+		t.Fatalf("len(migrations) == %d, expected 1", len(migrations))
+	}
+	gotID := int(migrations[0][0].ID)
+	expectedID := 101361
+	if gotID != expectedID {
+		t.Fatalf("Got ID: %d, expected: %d", gotID, expectedID)
+	}
+}
+
+func TestProductMarshal(t *testing.T) {
+	p := Product{ID: 42}
+	j, _ := json.Marshal(&p)
+	expected := []byte(`"id":42`)
+	if !bytes.Contains(j, expected) {
+		t.Errorf("Subslice %s not found in %s", expected, j)
 	}
 }

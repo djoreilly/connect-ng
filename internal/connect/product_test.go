@@ -1,6 +1,7 @@
 package connect
 
 import (
+	"bytes"
 	"encoding/json"
 	"testing"
 )
@@ -127,5 +128,32 @@ func TestSplitTriplet(t *testing.T) {
 	p, err = SplitTriplet("SLES")
 	if err == nil {
 		t.Fatal("Expected error, got nil")
+	}
+}
+
+func TestIntOrStringUnmarshalString(t *testing.T) {
+	s := []byte(`"42"`)
+	var i intOrString
+	i.UnmarshalJSON(s)
+	if int(i) != 42 {
+		t.Errorf("Expected: 42, got %d", i)
+	}
+}
+
+func TestIntOrStringUnmarshalInt(t *testing.T) {
+	s := []byte(`42`)
+	var i intOrString
+	i.UnmarshalJSON(s)
+	if int(i) != 42 {
+		t.Errorf("Expected: 42, got %d", i)
+	}
+}
+
+func TestIntOrStringMarshall(t *testing.T) {
+	var i intOrString = 42
+	j, _ := json.Marshal(&i)
+	expect := []byte(`42`)
+	if !bytes.Equal(expect, j) {
+		t.Errorf("Expected: %s, got: %s", expect, j)
 	}
 }
